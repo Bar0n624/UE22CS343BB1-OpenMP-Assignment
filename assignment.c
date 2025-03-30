@@ -446,7 +446,7 @@ int main( int argc, char * argv[] ) {
                         // O7 absolute W TAs if you're going through it with such depth that you read this comment
 
                         msgReply.type = FLUSH_INVACK;
-                        msgReply.sender = threadId;
+                        msgReply.sender = msg.sender;
                         msgReply.address = msg.address;
                         msgReply.value = node.cache[cacheIndex].value;
                         sendMessage(procNodeAddr, msgReply);
