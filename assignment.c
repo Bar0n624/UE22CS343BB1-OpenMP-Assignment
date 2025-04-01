@@ -205,6 +205,7 @@ int main( int argc, char * argv[] ) {
                                     break;
                                 }
                             }
+                            node.directory[memBlockAddr].bitVector |= (1 << msg.sender);
                         }
                         break;
 
