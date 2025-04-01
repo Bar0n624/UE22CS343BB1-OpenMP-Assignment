@@ -185,7 +185,11 @@ int main( int argc, char * argv[] ) {
                             sendMessage(msg.sender, msgReply);
 
                             //Now, to update the directory to S state and setting bit vectors...
-                            node.directory[memBlockAddr].state = S;
+                            if (msg.sender == threadId && node.directory[memBlockAddr].state == U) {
+                                node.directory[memBlockAddr].state = EM;
+                            } else {
+                                node.directory[memBlockAddr].state = S;
+                            }
                             node.directory[memBlockAddr].bitVector |= (1 << msg.sender);
 
                         } else if (node.directory[memBlockAddr].state == EM) {
@@ -220,7 +224,13 @@ int main( int argc, char * argv[] ) {
                         // Now, time to update the cacheline with the new address and value
                         node.cache[cacheIndex].address = msg.address;
                         node.cache[cacheIndex].value = msg.value;
-                        node.cache[cacheIndex].state = SHARED;
+                        if (msg.sender == threadId && node.directory[memBlockAddr].state == EM) {
+                            // If the sender is the same as the current processor, then we need to set it to MODIFIED
+                            node.cache[cacheIndex].state = EXCLUSIVE;
+                        } else {
+                            // Otherwise, we set it to SHARED
+                            node.cache[cacheIndex].state = SHARED;
+                        }
                         waitingForReply = 0;
                         break;
 
@@ -378,7 +388,6 @@ int main( int argc, char * argv[] ) {
 
                         if (node.directory[memBlockAddr].state == U) {
                             // Handle the case where no cache has this memory block
-
                             msgReply.type = REPLY_WR;
                             msgReply.sender = threadId;
                             msgReply.address = msg.address;
